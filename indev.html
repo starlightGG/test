@@ -7108,10 +7108,23 @@
 
                 if ('serviceWorker' in navigator) {
                     _piMark('pi-s5', 'active');
-                    const reg = await navigator.serviceWorker.register(getBasePath() + 'sw.js', { scope: getBasePath() });
-                    
-                    await navigator.serviceWorker.ready;
-                    
+try {
+  // 1. Register the Service Worker
+  const reg = await navigator.serviceWorker.register(getBasePath() + 'sw.js', { 
+    scope: getBasePath() 
+  });
+
+  // 2. Wait for the Service Worker to become active
+  // Note: navigator.serviceWorker.ready never rejects; it waits indefinitely
+  await navigator.serviceWorker.ready;
+
+  console.log('Service Worker is active!', reg.scope);
+} catch (error) {
+  // 3. Alert if registration fails (e.g., syntax error, incorrect path, non-HTTPS)
+  alert('Service Worker registration failed: ' + error.message);
+  console.error('Registration failed:', error);
+}
+
                     const wispUrl = localStorage.getItem("proxServer") ?? DEFAULT_WISP;
                     const allServers = getAllWispServers();
                     const autoswitch = localStorage.getItem('wispAutoswitch') !== 'false';
